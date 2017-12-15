@@ -33,7 +33,7 @@ var app = {
 		function create() {
 			app.punText = game.add.text(10, 10, app.puntos, {fontSize: '2em', fill: '#767676'});
 			app.bola = game.add.sprite(app.inicioX(), app.inicioY(), 'bola');
-			app.bola.setHealth(1000);
+			app.bola.health = 1000;
 			//app.enemigo = game.add.sprite(app.inicioX(), app.inicioY(), 'enemigo');
 			app.target = game.add.group();
 			app.enemigo = game.add.group();
@@ -70,9 +70,12 @@ var app = {
 			app.bola.body.bounce.setTo(0.1,0.1);
 			app.bola.body.onWorldBounds = new Phaser.Signal();
 			app.bola.body.onWorldBounds.add(app.atacado, this);
+                        
+                        app.cursors = game.input.keyboard.createCursorKeys();
 			
 		}
 		function update() {
+                        app.vigilaTeclado();
 			app.bola.body.velocity.x = app.vx * -5* (10 + app.tesoros) ;
 			app.bola.body.velocity.y = app.vy * 5* (10 + app.tesoros);
 			game.physics.arcade.enable(app.target);
@@ -83,6 +86,7 @@ var app = {
 			if(app.bola.health < 1){
 				app.punText.text = "Has muerto";
 				app.bola.kill();
+                                setTimeout(app.recomienza, 1000);
 			}
 		}
 
@@ -164,6 +168,20 @@ var app = {
 			console.log('agitacion');
 		}
 	},
+        vigilaTeclado: function(){
+            if(app.cursors.up.isDown){
+                app.vy--;
+            };
+            if(app.cursors.down.isDown){
+                app.vy++;
+            };
+            if(app.cursors.left.isDown){
+                app.vx++;
+            };
+            if(app.cursors.right.isDown){
+                app.vx--;
+            };
+        },
 	recomienza: function(){
 		document.location.reload(true);
 	}
