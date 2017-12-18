@@ -175,9 +175,10 @@ var app = {
 	vigilaSensores: function () {
 		var opciones = {frequency: 100};
 		function onError() {
-			console.log('Error');
+			alert('Error');
 		}
 		function onSuccess(datosAceleracion) {
+                        alert(app.vx+" , "+app.vy);
 			app.detectaAgitacion(datosAceleracion);
 			app.registraMovimiento(datosAceleracion);
 		}
