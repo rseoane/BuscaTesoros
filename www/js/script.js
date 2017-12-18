@@ -36,6 +36,7 @@ var app = {
 			app.bola.health = 1000;
 			//app.enemigo = game.add.sprite(app.inicioX(), app.inicioY(), 'enemigo');
 			app.target = game.add.group();
+                        app.target.enableBody = true;
 			app.enemigo = game.add.group();
 			app.enemigo.enableBody = true;
 			app.createTarget('ruby');
@@ -82,17 +83,23 @@ var app = {
 			game.physics.arcade.enable(app.enemigo);
 			game.physics.arcade.overlap(app.bola,app.target,app.botin,null,this);
 			game.physics.arcade.collide(app.bola,app.enemigo,app.atacado,null,this);
+                        game.physics.arcade.collide(app.enemigo,app.enemigo,null,null,this);
+                        game.physics.arcade.collide(app.target,app.enemigo,null,null,this);
+                        game.physics.arcade.collide(app.target,app.target,null,null,this);
                         app.compruebaPuntos();
 			app.punText.text = "Puntos: "+app.puntos+" Record: "+localStorage.getItem("record")+" Vida: "+app.bola.health;
 			if(app.bola.health < 1){
-				app.punText.text = "Has muerto";
-				app.bola.kill();
-                                setTimeout(app.recomienza, 1000);
+                            app.punText.text = "Has muerto";
+                            app.bola.kill();
+                            //the "click to restart" handler
+                            game.input.onTap.addOnce(function () {
+                                app.recomienza();
+                            })
 			}
 		}
-
+                
 		var estados = {preload: preload, create: create, update: update};
-		var game = new Phaser.Game(app.ancho, app.alto, Phaser.AUTO, 'phaser', estados)
+		var game = new Phaser.Game(app.ancho, app.alto, Phaser.AUTO, 'phaser', estados);
 	},
 	createTarget: function(type = null){
 		gems = ['diamond','ruby','ruby','emerald','emerald','emerald','sapphire','sapphire','sapphire','sapphire'];
@@ -104,6 +111,12 @@ var app = {
 		app.target.callAll('animations.add', 'animations', 'spin', null, 20, true);
 		//  And play them
 		app.target.callAll('animations.play', 'animations', 'spin');
+                app.target.forEach(app.fisicaTarget,this);
+	},
+        fisicaTarget: function(e){
+		e.body.collideWorldBounds = true;
+		e.body.onWorldBounds = new Phaser.Signal();
+                e.scale.setTo(0.8,0.8);
 	},
 	creaEnemigo: function(){
 		app.enemigo.create(app.inicioX(), app.inicioY(), 'enemigo', Math.floor((Math.random() * 66)));
@@ -138,6 +151,8 @@ var app = {
 	},
 	pared: function(){
 		app.bola.health -= 1;
+                app.vy = 0;
+                app.vx = 0;
 	},
         compruebaPuntos: function(){
             if(typeof(localStorage.getItem("record")) != 'undefined'){
@@ -194,7 +209,9 @@ var app = {
             };
         },
 	recomienza: function(){
-		document.location.reload(true);
+            app.target.callAll('kill');
+            app.enemigo.callAll('kill');
+            document.location.reload(true);
 	}
 }
 if ('addEventListener' in document) {
