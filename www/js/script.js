@@ -28,7 +28,7 @@ var app = {
 			game.load.spritesheet('ruby', 'img/rubyspinning.png', 30, 30, 34);
 			game.load.spritesheet('sapphire', 'img/sapphirespinning.png', 30, 30, 34);
 			game.load.spritesheet('emerald', 'img/emeraldspinning.png', 30, 30, 34);
-			game.load.spritesheet('enemigo', 'img/enemigos.png', 40, 38.45, 66);
+			game.load.spritesheet('enemigo', 'img/enemigos.png', 120, 116.45, 66);
 		}
 		function create() {
 			app.punText = game.add.text(10, 10, app.puntos, {fontSize: '2em', fill: '#767676'});
@@ -67,7 +67,7 @@ var app = {
 			game.physics.arcade.enable(app.enemigo);
 			
 			app.bola.body.collideWorldBounds = true;
-			app.bola.body.bounce.setTo(0.1,0.1);
+			app.bola.body.bounce.setTo(0.5,0.5);
 			app.bola.body.onWorldBounds = new Phaser.Signal();
 			app.bola.body.onWorldBounds.add(app.atacado, this);
                         
@@ -82,7 +82,8 @@ var app = {
 			game.physics.arcade.enable(app.enemigo);
 			game.physics.arcade.overlap(app.bola,app.target,app.botin,null,this);
 			game.physics.arcade.collide(app.bola,app.enemigo,app.atacado,null,this);
-			app.punText.text = "Puntos: "+app.puntos+" Vida: "+app.bola.health;
+                        app.compruebaPuntos();
+			app.punText.text = "Puntos: "+app.puntos+" Record: "+localStorage.getItem("record")+" Vida: "+app.bola.health;
 			if(app.bola.health < 1){
 				app.punText.text = "Has muerto";
 				app.bola.kill();
@@ -112,6 +113,7 @@ var app = {
 		e.body.collideWorldBounds = true;
 		e.body.onWorldBounds = new Phaser.Signal();
 		e.body.bounce.setTo(0.3, 0.3);
+                e.scale.setTo(0.4,0.4);
 	},
 	botin: function(){
 		if(arguments[1].key == 'diamond'){
@@ -137,6 +139,15 @@ var app = {
 	pared: function(){
 		app.bola.health -= 1;
 	},
+        compruebaPuntos: function(){
+            if(typeof(localStorage.getItem("record")) != 'undefined'){
+                if(localStorage.getItem("record") < app.puntos){
+                    localStorage.setItem("record", app.puntos);
+                };
+            }else{
+                localStorage.setItem("record", app.puntos);
+            };
+        },
 	inicioX: function () {
 		return app.aleatorio(app.ancho - app.diametro);
 	},
